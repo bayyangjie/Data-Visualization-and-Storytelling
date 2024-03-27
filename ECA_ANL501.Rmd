@@ -1,0 +1,355 @@
+---
+title: "ECA_ANL501"
+author: "Bay Yang Jie"
+date: "2023-09-19"
+output: word_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo=TRUE)
+
+```
+
+# R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+# Setting working directory
+```{r}
+setwd("/Users/ASUS/Library/CloudStorage/OneDrive-Personal/Desktop/SUSS/ANL501/ECA")
+
+```
+
+# Installing packages
+```{r}
+
+#install.packages(c('tidyverse','dplyr'))
+#install.packages("ggplot2")
+#install.packages("gganimate")
+#install.packages("gifski")
+#install.packages('transformr')
+#install.packages('directlabels')
+#install.packages('httr')
+#install.packages('jsonlite')
+#install.packages('WDI')
+```
+
+# Loading packages
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(socviz)
+library(gganimate)
+library(gifski)
+library(transformr)
+library(directlabels)
+library(httr)
+library(jsonlite)
+library(WDI)
+library(lubridate)
+library(stringr)
+library(ggrepel)
+library(maps)
+```
+
+# Loading dataset
+```{r}
+df <-read.csv("D:\\SUSS documents\\ANL501\\ECA\\FoodAid.csv")
+```
+
+#### Data Cleaning ####
+
+# Abbreviating column names
+```{r}
+names(df) <- substr(names(df),1,9)
+names(df)
+
+## Renaming abbreviations due to replicated abbreviated names
+df <- df %>%
+  rename(othr_ctry_aff = 15, neigh_ctry_aff =16, non_neigh_aff=17)
+
+## Correcting some values in 'country' column due to illegal symbols
+
+df <- df %>% 
+  mutate(country = str_replace(country, "C�te d'Ivoire", "Ivory Coast"))
+
+```
+Shortening the variable names for easier referencing. And also removing special characters in the variable names by renaming the country name (e.g from Cote d'Ivoire to "Ivory Coast).
+
+# Converting the dates into just 'year' values
+```{r}
+df$year <- format(as.Date(df$year, format="%d/%m/%Y"),"%Y")
+View(df)
+```
+Converting the dates to just 'year' values.
+
+# Converting data types of variables in 'df' dataframe
+```{r}
+a <- c(2:25)
+df[a] <- lapply(df[a],as.numeric)
+lapply(df , class)
+View(df)
+```
+Identifying the incorrect data types of variables and correcting them to the correct data types.
+
+# Arranging 'country' and 'year' columns in order
+```{r}
+df %>% arrange(factor(country, as.character(unique(country))), year) -> df 
+# Classify unique values in 'column' first before arranging into alphabetical order
+View(df)
+str(df)
+```
+Verifying that the data types of all variables are correct at the same time.
+
+#### Extracting relevant variables from WDI package ####
+```{r}
+wdi_dat <- WDI(indicator = c("IS.RRS.TOTL.KM", "MS.MIL.TOTL.P1", "IS.AIR.GOOD.MT.K1", "IS.SHP.GOOD.TU"), start = 2002, end = 2020, extra = TRUE)
+wdi_dat <- subset(wdi_dat, region %in% "Sub-Saharan Africa")
+names(wdi_dat)[which(names(wdi_dat) == "MS.MIL.TOTL.P1")] <- "arm_person"
+names(wdi_dat)[which(names(wdi_dat) == "IS.RRS.TOTL.KM")] <- "rail_lines"
+names(wdi_dat)[which(names(wdi_dat) == "IS.AIR.GOOD.MT.K1")] <- "air_freight"
+names(wdi_dat)[which(names(wdi_dat) == "IS.SHP.GOOD.TU")] <- "port_traffic"
+View(wdi_dat)
+
+## Removing unwanted columns
+wdi_dat <- wdi_dat[-c(2:3, 5:6, 15:16)]
+View(wdi_dat)
+
+## Ordering the values in 'year' column in ascending order for each country
+wdi_dat %>% arrange(factor(country, as.character(unique(country))), year) -> wdi_dat
+View(wdi_dat)
+str(wdi_dat)
+
+## Converting data types of the WDI variables
+i <- c(2:3 , 9:10)
+wdi_dat[i] <- lapply(wdi_dat[i], as.numeric)
+lapply(wdi_dat , class)
+```
+```{r}
+View(wdi_dat)
+View(df)
+```
+
+Retrieving some variables from the WDI dataset that are relevant to the study between conflict and food aid in SSA region. Each variable in the WDI dataset is attached with a unique code identifier. These identifiers were retrieved from an online WDI catalogue. Steps were taken to clean the imported WDI dataset by removing unwanted columns and also ensuring the variables data types are correct.
+
+
+# Joining WDI dataset and food aid dataset using LEFT JOIN
+```{r}
+food_WDI <- left_join(df,wdi_dat)
+View(food_WDI)
+```
+Joining the WDI dataset "wdi_dat" with the food_aid dataset "df" to create a combined dataset "food_WDI".
+
+# Data Pre-processing
+```{r}
+tbl_sum(food_WDI)
+
+## grouping the dataframe by countries
+food_WDI_group <- group_by(food_WDI , country)
+tbl_sum(food_WDI_group)
+
+## Creating a new dataframe of mean emergency aid of the countries after grouping
+food_WDI_sum <- summarise(food_WDI_group , emergency.mean=mean(emergency, na.rm=TRUE))
+food_WDI_sum
+food_WDI_sum[order(food_WDI_sum$emergency.mean, decreasing = TRUE),]
+
+```
+Based on the summarised mean of emergency food aid received, Ethiopia, Sudan, Somalia and Kenya are amongst the countries with the highest aid needed. The figures are also significantly higher than the other sub-saharan african countries in the region.
+
+######### Plotting ############
+
+## Emergency Aid Bar Chart
+```{r}
+emerg_high <- food_WDI %>% group_by(country) %>%
+                   summarise(emerg_high_mean = mean(emergency),
+                             .groups = 'drop') # grouping countries together and getting the mean per country
+emerg_high %>%
+  filter(emerg_high_mean>10) -> emerg_high_mean # filtering countries with emergency aid > 10 million USD
+
+ggplot(emerg_high_mean , aes(x=country , y=emerg_high_mean)) + geom_bar(stat='identity') + coord_flip() + 
+  labs(title="Bar Chart of Emergency Aid of Sub Saharan countries",
+       y="Emergency Aid (million USD)",
+       x="Countries") + 
+  theme_minimal()+
+  theme(axis.title.x = element_text(size=10 , margin=margin(t=20)),
+axis.title.y = element_text(size= 10, margin = margin(r=20)))
+```
+The above bar chart shows the countries that have emergency aid received above 10 million USD, and it shows that Sudan and Ethiopia have the highest amount of emergency aid received.
+
+ 
+# Impact of natural disasters on SSA countries
+```{r}
+food_WDI[ c('country' , 'year', 'death_dis')] -> food_WDI_2
+View(food_WDI_2)
+
+## calculating the mean of deaths by disaster for individual countries
+death_dis_mean = food_WDI_2 %>% group_by(country) %>%
+                   summarise(death_dis_mean = mean(death_dis),
+                             .groups = 'drop')
+death_dis_mean %>%
+  filter(death_dis_mean > 100) -> death_dis_high # classified above 100 deaths as high number
+
+ggplot(death_dis_high , aes(x=country , y=death_dis_mean)) + geom_bar(aes(fill=country) , stat='identity') +
+  theme(axis.text.x = element_text(angle=90) , legend.position = "none") +
+  theme(legend.position="none") +
+  labs(title="Mean Disaster-Related Deaths",
+       subtitle="Countries with mean deaths > 100",
+       x="Country",
+       y="Mean disaster deaths") +
+  geom_hline(yintercept = 250, size=1.1, color="gray40", alpha=0.4)
+```
+The above bar chart shows countries that have mean number of deaths by disaster > 100.
+Somalia had the highest average number of disaster related deaths during 2002 to 2020, and they were the country with 3rd highest emergency aid received. Sudan and Ethiopia are amongst the lowest despite having high emergency aid.
+Average disaster related deaths for majority of countries remained below 250. This shows that impact of natural disaster on the Sub-Saharan African countries was low in general. 
+
+# Impact of natural disaster on food aid
+```{r}
+## Scatterplot showing relationship between emergency aid received and total number affected by natural disasters
+
+ggplot(food_WDI, aes(x=affected_ , y=emergency)) + geom_point(alpha=0.4) +
+  labs(title="Relationship between food aid and number of people affected by disaster",
+       x= "No. of people affected by natural disaster",
+       y= "Emergency Food Aid ") +
+  theme_minimal() + 
+  theme(axis.title.x = element_text(size = 12, margin = margin(t=20)),
+        axis.title.y = element_text(size=12, margin=margin(r=20)))
+```
+Higher number of people affected by natural disaster suggests a more serious impact of the disaster. In the plot, it shows that even with higher number of people affected, the emergency aid does not increase proportionately.
+
+# Bar chart to show the counts of major conflicts by affected countries
+```{r}
+## filtering countries that suffered major conflicts
+food_WDI[c("country" , "major_con")] -> food_WDI_mc
+View(food_WDI_mc)
+
+food_WDI_mc %>%
+  filter(major_con == "1") -> major_con_1
+
+## summing the number of major conflicts of each country
+agg_tbl <- major_con_1 %>% 
+  group_by(country) %>% 
+  summarise(total_count=n(),
+            .groups = 'drop')
+agg_tbl
+
+agg_tbl[order(agg_tbl$total_count , decreasing=TRUE),] -> agg_tbl_1
+agg_tbl_1
+
+ggplot(agg_tbl_1 , aes(x=country , y=total_count)) + geom_bar(stat = 'identity', aes(fill=country)) +
+  theme(axis.text.x = element_text(angle = 90 , hjust=0.5, vjust=0.5)) +
+  labs(title = "Summary of countries with major conflicts",
+       x="Country",
+       y="Major conflicts count") + 
+  theme(legend.position = "none")
+```
+The bar chart shows that Sudan had the highest count of major conflicts which tallies with it having one of the highest emergency aid received. This shows that major conflicts led to Ethiopia requiring a high amount of emergency aid received.
+
+# Bar chart to show minor conflicts count by affected countries
+```{r}
+## countries that suffered minor conflicts from 2002 to 2020
+filter(food_WDI,minor_con == "1") -> minor_con_1
+View(minor_con_1)
+
+## totalling the number of times minor conflicts happened for each country
+agg_tbl <- minor_con_1 %>% group_by(country) %>% 
+  summarise(total_count=n(),
+            .groups = 'drop')
+
+agg_tbl
+
+agg_tbl[order(agg_tbl$total_count , decreasing=TRUE),] -> agg_tbl_2
+agg_tbl_2
+
+ggplot(agg_tbl_2 , aes(x=country , y=total_count)) + geom_bar(stat = 'identity', aes(fill=country)) +
+  theme(axis.text.x = element_text(angle = 90 , hjust=0.5, vjust=0.5)) +
+  labs(title = "Summary of countries with minor conflicts",
+       x="Country",
+       y="Minor conflicts count") + 
+  theme(legend.position = "none")
+```
+As compared to the major conflicts bar plot, it can be seen that more countries suffered minor conflicts as opposed to the list of countries in major conflicts. 
+In terms of emergency aid, Ethiopia had the highest amount of emergency aid received.This could be due to the high number of minor conflicts encountered throughout the years.
+
+# Scatterplot to show the relationship between emergency food aid and inflation
+```{r}
+food_WDI %>%
+  group_by(country) %>%
+  summarise(mean = mean(emergency)) -> emergency_mean_ctry
+emergency_mean_ctry
+
+food_WDI %>%
+  group_by(country) %>%
+  summarise(mean = mean(inflation)) -> infltn_mean_ctry
+infltn_mean_ctry
+
+full_join(emergency_mean_ctry , infltn_mean_ctry , by="country") -> infltn_emerg
+
+ggplot(infltn_emerg , aes(x=mean.y , y=mean.x, color=country)) + geom_point() +
+  labs(x= "Mean of Inflation Values",
+       y= "Mean of Emergency Aid",
+       title="Scatterplot of Mean Emergency Aid vs Mean Inflation")+
+  theme(legend.position = "none",
+        axis.title.x = element_text(margin = margin(t=15)),
+        axis.title.y = element_text(margin = margin(r=15)))
+```
+The scatterplot shows that emergency aid has a disproportionate relationship to inflation. This can be seen from the plot that even as inflation levels goes up, emergency aid does not increase proportionately.
+
+```{r}
+food_WDI %>%
+  group_by(country) %>%
+  summarise(mean = mean(arm_person , na.rm=TRUE)) -> arm_person_avg
+arm_person_avg
+
+left_join(emergency_mean_ctry , arm_person_avg , by="country") -> arm_per_emerg
+
+ggplot(arm_per_emerg , aes(x=mean.y , y=mean.x)) + geom_point(aes(color=country) , alpha=0.4) +
+  labs(x="Mean of Armed Personnel",
+       y="Mean of Emergency Aid",
+       title="Relationship between Emergency Aid and Armed Personnel") +
+  theme(legend.position="none",
+        axis.title.x = element_text(margin = margin(t=20)),
+        axis.title.y = element_text(margin = margin(r=20)))
+```
+The scatterplot relationship shows that higher number of armed personnel does not necessarily lead to more emergency aid that can be delivered. 
+
+# Relationship between GDP Per Capita and Emergency aid received
+```{r}
+## Data points used in the plot are countries with GDP > 5000 & countries with GDP < 1000. 
+
+agg_tbl_4 <- food_WDI %>% group_by(country) %>% 
+  summarise(mean_gdp=mean(gdp_per_c , na.rm=TRUE),
+            .groups = 'drop')
+agg_tbl_4[order(agg_tbl_4$mean_gdp, decreasing =TRUE),] -> agg_tbl_4
+View(agg_tbl_4)
+
+## Filtering countries with GDP > 5000
+agg_tbl_4 %>%
+  filter(mean_gdp > 5000) -> agg_tbl_5
+
+## Filtering countries with GDP < 1000
+agg_tbl_4 %>%
+  filter(mean_gdp < 1000) -> agg_tbl_6
+
+## Creating 2 separate dataframes
+inner_join(agg_tbl_5 , emergency_mean_ctry ,  by="country") -> merged_df
+View(merged_df)
+
+inner_join(agg_tbl_6 , emergency_mean_ctry , by="country") -> merged_df_2
+View(merged_df_2)
+
+ggplot() + 
+  geom_point(merged_df , mapping = aes(x=mean_gdp , y=mean , color=country), size = 2) + 
+  geom_point(merged_df_2 , mapping = aes(x=mean_gdp , y=mean , color=country) , size=2) +
+  labs(title = "Plot of Mean Emergency Aid vs GDP Per Capita ",
+       subtitle = "Plot points represent countries with GDP > 5000 & GDP < 1000",
+       x="Mean GDP Per Capita",
+       y="Mean Food Aid Received (million USD)") +
+    theme(axis.title.x = element_text(size = 12, margin = margin(t=15)),
+          axis.title.y = element_text(size=12, margin=margin(r=15))) + 
+  geom_vline(xintercept = c(1000,5000))
+
+```
+The scatter plot shows that countries with GDP Per Capita < 1000 receive mostly higher mean emergency aid than those countries with GDP Per Capita > 5000. This comparison between the two extreme ends of GDP Per Capita shows that lower GDP Per Capita leads to more emergency food aid needed by a country.
