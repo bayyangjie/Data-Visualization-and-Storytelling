@@ -1,13 +1,12 @@
-# Background of project
-
-## Objective
-The dataset was retrieved from the World Development Indicators (WDI) database. The objective of the project was to compose visualisations to shed light on conflict and food aid in 
+## Project Objective
+The source of the dataset was from the World Development Indicators (WDI) database. The objective of the project was to compose visualisations to shed light on conflict and food aid in 
 Sub-Saharan Africa. Additionally, the visualizations had to demonstrate whether there is an association between food aid and conflict.
 
 ## What was done
-- Extracted the variables from the database site that are relevant to the objectives and then combined them into a separate data frame as the master data frame to start with
-- Data cleaning and processing were performed to verify the quality of the data and to ensure the correctness of variable data types
-- Plotted visualizations (bar charts, scatterplots) between variables using the ggplot2 package to understand the relationship between them and ultimately forming insights that fulfil the objectives
+- Libraries from the tidyverse package were used for the most part in this project
+- Extracted more variables from the WDI site that are deemed relevant to the objectives and combined them into the main CSV dataset. This was achieved using the JOIN function.
+- Data cleaning and manipulation steps were performed such as abbreviating variable names, variables data type conversion, and extracting year values from dates.
+- Plotted visualizations (bar charts, scatterplots) between variables using the ggplot2 package to understand the relationship between them and ultimately form insights that fulfil the objectives
 
 
 Scatterplot showing relationship between food aid and people affected by disasters:
