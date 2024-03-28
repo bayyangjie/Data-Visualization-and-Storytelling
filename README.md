@@ -51,9 +51,12 @@ View(food_WDI)
 
 Scatterplot showing relationship between food aid and people affected by disasters:
 ![Image 1](https://github.com/bayyangjie/Data-Visualization-and-Storytelling/blob/main/Images/Picture%201.png?raw=true) <br> <br>
+
 Bar plot summary of countries with major conflicts:
 ![Image 2](https://github.com/bayyangjie/Data-Visualization-and-Storytelling/blob/main/Images/Picture%202.png?raw=true) <br> <br>
+
 Bar plot summary of countries with minor conflicts:
 ![Image 3](https://github.com/bayyangjie/Data-Visualization-and-Storytelling/blob/main/Images/Picture%203.png?raw=true) <br> <br>
+
 Bar plot summary of emergency aid received by Sub-Saharan countries:
 ![Image 4](https://github.com/bayyangjie/Data-Visualization-and-Storytelling/blob/main/Images/Picture%204.png?raw=true)
