@@ -2,7 +2,7 @@
 The source of the dataset was from the World Development Indicators (WDI) database. The objective of the project was to compose visualisations to shed light on conflict and food aid in 
 Sub-Saharan Africa. Additionally, the visualizations had to demonstrate whether there is an association between food aid and conflict.
 
-## What was done
+## Learning points
 - Libraries from the tidyverse package were used for the most part in this project
 - Extracted more variables from the WDI site that are deemed relevant to the objectives and combined them into the main CSV dataset. This was achieved using the JOIN function.
 - Data cleaning and manipulation steps were performed such as abbreviating variable names, variables data type conversion, and extracting year values from dates.
