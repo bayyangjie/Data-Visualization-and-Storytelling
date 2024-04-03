@@ -112,7 +112,7 @@ The bar chart shows that Sudan had the highest count of major conflicts which ta
 #### Bar plot summary of countries with minor conflicts
 Filter() function was used again to filter only those countries that suffered minor conflicts and assigned a new variable 'minor_con_1' to the filtered dataframe.
 Similarly, group_by() was used to group the distinct countries and then summarise() was used to retrieve the total count of minor conflicts that occurred for each country.
-As compared to the major conflicts bar plot, more countries suffered minor conflicts as opposed to the list of countries in major conflicts. In terms of emergency aid, Ethiopia received the highest amount of emergency aid. This could be due to the high number of minor conflicts.![image](https://github.com/bayyangjie/Data-Visualization-and-Storytelling/assets/153354426/d0b8bd21-46ce-4862-aa46-0a4d8f4df727)
+As compared to the major conflicts bar plot, more countries suffered minor conflicts as opposed to the list of countries in major conflicts. In terms of emergency aid, Ethiopia received the highest amount of emergency aid. This could be due to the high number of minor conflicts.
 
 ![Image 3](https://github.com/bayyangjie/Data-Visualization-and-Storytelling/blob/main/Images/Picture%203.png?raw=true) <br> <br>
 
