@@ -24,7 +24,8 @@ df <- df %>%
 df <- df %>% 
   mutate(country = str_replace(country, "C�te d'Ivoire", "Ivory Coast"))
 ```
-Shortening the variable names for easier referencing. And also removing special characters in the variable names by renaming the country name (e.g from Cote d'Ivoire to "Ivory Coast). <br>
+Shortening the variable names for easier referencing. And also removing special characters in the variable names by renaming the country name (e.g from Cote d'Ivoire to "Ivory Coast).<br>
+
 
 #### Converting dates into just 'year' values:
 ```
