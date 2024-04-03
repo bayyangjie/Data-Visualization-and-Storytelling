@@ -79,8 +79,8 @@ View(food_WDI)
 ```
 <br>
 
+#### Grouping the dataframe by countries
 ```
-## grouping the dataframe by countries
 food_WDI_group <- group_by(food_WDI , country)
 tbl_sum(food_WDI_group)
 
