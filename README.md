@@ -89,8 +89,9 @@ food_WDI_sum <- summarise(food_WDI_group , emergency.mean=mean(emergency, na.rm=
 food_WDI_sum
 food_WDI_sum[order(food_WDI_sum$emergency.mean, decreasing = TRUE),]
 ```
-Grouping by countries and calculating the mean emergency aid of each country. <br>
+Grouping by countries and calculating the mean emergency aid of each country.
 
+<br>
 
 ### Plotting
 
