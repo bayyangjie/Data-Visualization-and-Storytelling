@@ -6,7 +6,7 @@ Sub-Saharan Africa. Additionally, the visualizations had to demonstrate whether 
 - Libraries from the tidyverse package were used for the most part in this project
 - Extracted more variables from the WDI site that are deemed relevant to the objectives and combined them into the main CSV dataset. This was achieved using the JOIN function.
 - Data cleaning and manipulation steps were performed such as abbreviating variable names, variables data type conversion, and extracting year values from dates.
-- Plotted visualizations (bar charts, scatterplots) between variables using the ggplot2 package to understand the relationship between them and ultimately form insights that fulfil the objectives
+- Plotted visualizations (bar charts, scatterplots) between variables using the ggplot2 package to understand the relationship between them and ultimately form insights that fulfil the objectives <br>
 
 ### Data Cleaning
 
@@ -24,13 +24,14 @@ df <- df %>%
 df <- df %>% 
   mutate(country = str_replace(country, "C�te d'Ivoire", "Ivory Coast"))
 ```
-Shortening the variable names for easier referencing. And also removing special characters in the variable names by renaming the country name (e.g from Cote d'Ivoire to "Ivory Coast).
+Shortening the variable names for easier referencing. And also removing special characters in the variable names by renaming the country name (e.g from Cote d'Ivoire to "Ivory Coast). <br>
 
 #### Converting dates into just 'year' values:
 ```
 df$year <- format(as.Date(df$year, format="%d/%m/%Y"),"%Y")
 View(df)
 ```
+<br>
 
 #### Converting variable data types:
 ```
@@ -39,6 +40,7 @@ df[a] <- lapply(df[a],as.numeric)
 lapply(df , class)
 View(df)
 ```
+<br>
 
 ### Data manipulation
 
@@ -66,13 +68,14 @@ i <- c(2:3 , 9:10)
 wdi_dat[i] <- lapply(wdi_dat[i], as.numeric)
 lapply(wdi_dat , class)
 ```
+<br>
 
 #### Joining WDI dataset and food aid dataset using LEFT JOIN:
 ```
 food_WDI <- left_join(df,wdi_dat)
 View(food_WDI)
 ```
-Joining the WDI dataset "wdi_dat" with the food_aid dataset "df" to create a combined dataset "food_WDI".
+<br>
 
 ```
 ## grouping the dataframe by countries
@@ -84,7 +87,8 @@ food_WDI_sum <- summarise(food_WDI_group , emergency.mean=mean(emergency, na.rm=
 food_WDI_sum
 food_WDI_sum[order(food_WDI_sum$emergency.mean, decreasing = TRUE),]
 ```
-Grouping by countries and calculating the mean emergency aid of each country. 
+Grouping by countries and calculating the mean emergency aid of each country. <br>
+
 
 ### Plotting
 
