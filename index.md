@@ -8,7 +8,7 @@ Sub-Saharan Africa. Additionally, the visualizations had to demonstrate whether 
 - Data cleaning and manipulation steps were performed such as abbreviating variable names, variables data type conversion, and extracting year values from dates.
 - Plotted visualizations (bar charts, scatterplots) between variables using the ggplot2 package to understand the relationship between them and ultimately form insights that fulfil the objectives <br>
 
-### Data Cleaning
+## Data Cleaning
 
 #### Abbreviation of column names
 ```
@@ -44,7 +44,7 @@ View(df)
 ```
 <br>
 
-### Data manipulation
+## Data manipulation
 
 #### Extracting relevant variables from WDI package
 ```
@@ -93,7 +93,7 @@ Grouping by countries and calculating the mean emergency aid of each country.
 
 <br>
 
-### Plotting
+## Plotting
 
 #### Scatterplot showing relationship between food aid and people affected by disasters
 The variable 'affected' which represents the number of people affected by disaster forms the x-axis and the variable 'Emergency Food Aid' which represents the amount of food aid delivered forms the y-axis.
