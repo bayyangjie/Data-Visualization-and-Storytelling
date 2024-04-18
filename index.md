@@ -122,7 +122,7 @@ The data is filtered to only show those countries that have mean emergency aid o
 
 ![Image 4](https://github.com/bayyangjie/Data-Visualization-and-Storytelling/blob/main/Images/Picture%204.png?raw=true)
 
-### Significant findings
+## Significant findings
 
 This conclusion summarizes the factors that affect emergency aid and the variables that do not affect emergency aid. 
 Emergency food aid is affected by conflicts, natural disasters, and GDP per capita. As inferred from the plots, high minor conflicts such as in Ethiopia can lead to high emergency aid while high major conflict such as in Sudan can also lead to requiring high emergency aid. So conflicts in general regardless of high or low could lead to an increase in aid needed by countries. Secondly, natural disasters also do play a part in high emergency food aid. Somalia being the most affected by natural disasters, is the country with the third highest amount of emergency food aid received. Lastly, countries that have a low GDP per capita such as Mozambique and Mauritania received higher amount of emergency food aid as compared to the other countries with higher GDP per capita. On the other hand, factors such as high armed personnel and inflation levels do not contribute to increased emergency food aid. In summary, conflicts are not the only contributing factors that lead to rise in emergency food aid needed in the SSA region.
